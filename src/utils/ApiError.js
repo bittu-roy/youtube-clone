@@ -14,6 +14,8 @@ class ApiError extends Error{
       this.success= false;
       this.errors= errors
 
+
+      //programmers usually try to keep errors in form of stack so we wrote the below code.
       if(stack){
         this.stack= stack
       }

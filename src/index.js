@@ -5,6 +5,7 @@ dotenv.config({
     path: './env'
 })
 
+//calling our function which connects the database.
 connectDB()
 .then(()=>{
     app.on((error)=>{

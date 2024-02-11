@@ -1,0 +1,26 @@
+In this lesson we created user and video model with hooks and JWT.
+1. At first we built user and video model schemas.
+2. we installed few packages- 
+        ->aggregate (a plugin used to write aggregate functions) 
+        ->bcrypt (helps us to hash our password) 
+        ->jwt (used to make tokens with the help of cryptographical algorithms)
+3. JWT tokens- it consists of 3 parts:->
+                1. Header
+                2. Payload- which consists of data we want to send and the data gets 
+                            encrypted.
+                3. verification signature- it contains a secret code which makes each 
+                                           token unique and by this protects our data.
+
+4. Bcrypt- We cannot encrypt our data directly for that we need the help of middlewares  
+           (hooks) which bycrypt provides us and so we use the (pre hook) for our password protection.
+           ->Pre Hook- just before our data will be saved, with the help of this hook  
+                       we can execute any piece of code. Here just before we are going to save our password we use this hook so that our password can get encrypted.  
+                       Inside pre hook we pass a 1.functionality-- for now it is "save" and we pass a 2.call back function, we don't use '()=>{}' function as it doesn't contains 'this reference' so we use async instead.
+            ->After encrypting our password using bycrypt.compare() we check whether our password is same as the password present in DB or not.
+
+5. Now we use JWT tokens-> Here we use 4 things ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY, 
+                           REFRESH_TOKEN_SECRET and REFRESH_TOKEN_EXPIRY.
+                           now using sign()--> we generate tokens.
+                           1. we generate ACCESS TOKENS=> we use jwt.sign() inside it we pass three things the 1.payload 
+                                                 2. ACCESS_TOKEN_SECRET url from env file 3. ACCESS_TOKEN_EXPIRY
+                            2. we generate REFRESH TOKENS=> like we generated access tokens. nut it consists of less payload as refresh tokens gets refreshed frequently and the expiry of refersh tokens is much more longer.                               
