@@ -1,15 +1,10 @@
-Chapter 11.-Uploading File using Backend
+Chapter 13:- Complete guide for routers and controllers.
 
-we installed two packages->
-                     1. Cloudinary- where we will upload our files from local server
-                     2. multer- helps us to upload files in local server.
-        Now how we will do this..?
-        1. We will upload the files through user using multer and keep that file temprarily on localStorage (localServer)
-        2. Using Cloudinary we will take that file from the localStorage and put that file on the Cloudinary Server. 
-We created a cloudinary.js files inside utils. (cloudinary.js)
-   where we have written down the logic how we will upload our file from the local server to cloudinary server.
+1. Here we created two files one for routes (user.routes.js) and controller (user.controller.js) 
+2. in (controller.js) we used the async function where we declared a method for success for registerUser
+3. in (routes.js) we declared the method where basically we redirected our path to /register with the help of controller.js method.
+4. in (app.js) we imported and declared routes using app.use middleware 
+5. Finally we check on postman whether our route is working or not.
 
-Then we created our first middlewares (multer.middleware.js)
-   where we used multer and with the help of diskStorage we have wriiten down the logic how to upload our file on server.
-
-Finally after 11 chapters we have finished our setup                          
+So how the route works is... 
+1. this is our path (http://localhost:8000/users)-> users.routes.js (http://localhost:8000/users/register) -> user.controller.js (we retrieve a message: "OK"/ success message).

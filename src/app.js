@@ -15,5 +15,14 @@ app.use(express.urlencoded({extended: true, limit: "16kb"})) //URLS generally co
 app.use(express.static("public"))// here basically if we want to store certain images or files in public just like our public folder. 
 app.use(cookieParser()) //here what happens is we can perform crud operations on the cookies of the users browser
 
+//routes import
+import userRouter from "./routes/user.routes.js"
+
+
+//routes declaration: -basically we will use middlewares
+app.use("/api/v1/users", userRouter)
+//the above syntax means something like this:- https://localhost:8000/api/v1/users/register
+//here basically we mention the path(controller) and the it moves in the controller and uses register.
+
 
 export {app};
