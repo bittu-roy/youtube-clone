@@ -1,5 +1,5 @@
 import mongoose, {Schema} from "mongoose";
-import { jwt } from "jsonwebtoken";   //These both frameworks help us to encrypt our data
+import  jwt  from "jsonwebtoken";   //These both frameworks help us to encrypt our data
 import bcrypt from "bcrypt";
 
 //We cannot do encryption directly so we need the help of some mongoose hooks (middleware hooks).
@@ -65,7 +65,7 @@ userSchema.pre("save", async function (next) {
     }
     
     //Here password encryption takes place only if password is modified 
-    this.password= bcrypt.hash(this.password, 10)
+    this.password= await bcrypt.hash(this.password, 10)
     next()
 })
 
