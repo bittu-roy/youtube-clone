@@ -18,7 +18,7 @@ const registerUser= asyncHandler(async(req, res)=>{
     
     //1.get user details from frontend.
     const {fullname, username, email, password}= req.body
-    console.log("email:", email);
+    //console.log("email:", email);
     
     //2.validate everything-  whether all the fields are empty or not
     if(
@@ -29,7 +29,7 @@ const registerUser= asyncHandler(async(req, res)=>{
     }
     
     //3. check if user already exist- through email, username..
-    const existedUser= User.findOne({
+    const existedUser= await User.findOne({
         $or: [{ username }, { email }]
     })
     if(existedUser){
@@ -38,7 +38,15 @@ const registerUser= asyncHandler(async(req, res)=>{
 
      //4. check for images, avatar.
      const avatarLocalPath= req.files?.avatar[0]?.path;
-     const coverImageLocalPath= req.files?.coverImage[0]?.path;
+     //const coverImageLocalPath= req.files?.coverImage[0]?.path;
+    
+    //here basicalyy we are checking whether is someone doesn't upload coverImage then there should not be any error. 
+    //isArray-> checks whether properly Array has come or not for the argument provided. 
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length> 0){
+        coverImageLocalPath= req.files.coverImage[0].path;
+    }
+
      if(!avatarLocalPath){
         throw new ApiError(400, "Avatar is required")
      }

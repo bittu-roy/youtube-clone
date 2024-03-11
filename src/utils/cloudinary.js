@@ -15,8 +15,12 @@ const uploadOnCloudinary= async (localFilePath)=>{
             resource_type: "auto"
         })
         //file has been uploaded successfully
-        console.log("file is uploaded on cloudinary", response.url);
-        return response;
+      //   console.log("file is uploaded on cloudinary", response.url);
+
+      //file is uploaded successfully so we remove/unlink the file and we are using unlinkSync because we want to move forward even after this.
+      
+      fs.unlinkSync(localFilePath)
+      return response;
 
      }
      //if file doesn't gets uploaded then for a safe cleaning purpose the local path should be removed from the server.
