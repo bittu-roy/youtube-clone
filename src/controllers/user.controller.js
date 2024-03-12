@@ -4,7 +4,33 @@ import {User} from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-//this method will help us to register a user
+
+//a function to generate access and refresh tokens.
+const generateAccessAndRefreshTokens= async(userId)=>{ 
+    try{
+         //finding user by id.
+         const user= await User.findById(userId)
+         
+         //generating access and refresh token
+         const accessToken= user.generateAccessToken()
+         const refreshToken= user.generateRefreshToken()
+         
+         //adding and saving refresh token to our database
+         user.refreshToken= refreshToken
+         await user.save({ validateBeforeSave: false })
+
+         //return access token and regfresh token
+         return{accessToken, refreshToken}
+    }
+    catch(error){
+        throw new ApiError(500, "Something went wrong while generating refresh and access token")
+    }
+}
+
+
+const registerUser= asyncHandler(async(req, res)=>{
+    
+    //this method will help us to register a user
     //steps to follow in registerUser:-
         //1.get user details from frontend.
         //2.validate everything-  whether email is in correct format or not
@@ -14,7 +40,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
         //6. create user object- because we need to store it in our DB nad for that we nee to pass it in objects using .create
         //7. remove password and response filed from the response
         //8. finally return our RESPOSNE.
-const registerUser= asyncHandler(async(req, res)=>{
+    
+    
     
     //1.get user details from frontend.
     const {fullname, username, email, password}= req.body
@@ -83,6 +110,115 @@ const registerUser= asyncHandler(async(req, res)=>{
     )
 })
 
-//Now we have created our method but when should we use our method..? whenever a URL gets hit then it should run for that we need routes and now inside routes folder we will create multiple routes.
 
-export {registerUser}
+
+const loginUser= asyncHandler(async(req, res)=>{
+      
+    //1. bring data from req.body
+    //2. username or email base to login
+    //3. find the user
+    //4. password check
+    //5. access and refresh token
+    //6. send cookies
+
+    //1. bringing data from req.body   
+    const {email, username, password}= req.body
+
+    //2. checking if username or email exists or not
+    if(!username || !email){
+        throw new ApiError(400, "username or email is required")
+    }
+
+    //3. finding the user based on email or username by using a mongoDB method
+    const user= await User.findOne({
+        $or: [{username}, {email}]
+    })
+
+    if(!user){
+        throw new ApiError(404, "User does not exist")
+    }
+    
+    //4. doing a password check and we are passing user's 'password' as the password which is saved in our databse is 'this.password'
+    const isPasswordValid= await user.isPasswordCorrect(password) 
+
+    if(!isPasswordValid){
+        throw new ApiError(401, "Invalid user Credentials")
+    }
+    
+    //5. returning access token and refresh token
+    const {accessToken, refreshToken}= await generateAccessAndRefreshTokens(user._id)
+    
+    //Now what happens we have access of the user which is present inside loginUser and so it has some unwanted field which it will return to the user like password and also the refresh token is empty as we have the reference of user which is present inside loginUser so we make another DATABASE_QUERY. and using .select() we are not returning the password as well as the refresh token field.
+    const loggedInUser= await User.findById(user._id).select("-password -refreshToken")
+    
+    //6. sending cookies
+    //by default anyone can modify cookies in the frontend but using "httpOnly && secure"--> these cookies will only get modified from the server side.
+    const options={
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+        new ApiResponse(
+            200,
+            {
+               user: loggedInUser, accessToken, refreshToken
+            },
+            "User logged in Successfully"
+        )
+    )
+    
+    
+})
+
+
+const logoutUser= asyncHandler(async(req, res)=>{
+     
+    //steps to follow in logout
+    //1. reset refresh tokens
+    //2. clear cookies
+    await User.findByIdAndUpdate(
+        //deleting/updating refresh token
+        req.user._id,
+        {
+            $set: {
+                refreshToken: undefined
+            }
+        },
+        {
+            new: true
+        }
+    )
+    
+    //removing cookies
+    const options={
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(
+          new ApiResponse(
+               200, 
+               {}, 
+               "User logged Out"
+            )
+        )
+})
+
+
+export {
+    registerUser, 
+    loginUser,
+    logoutUser
+}
+
+
+//Now we have created our method but when should we use our method..? whenever a URL gets hit then it should run for that we need routes and now inside routes folder we will create multiple routes.
