@@ -1,7 +1,7 @@
-import { ApiError } from "../utils/ApiError"
-import { asyncHandler } from "../utils/asyncHanlder"
-import { jwt } from "jsonwebtoken"
-import { User } from "../models/user.model"
+import { ApiError } from "../utils/ApiError.js"
+import { asyncHandler } from "../utils/asyncHanlder.js"
+import  jwt  from "jsonwebtoken"
+import { User } from "../models/user.model.js"
 
 // we used (req, _, next) _-> resposne but we are not using response so we write _ here.
 export const verifyJWT= asyncHandler(async(req, _, next)=>{
