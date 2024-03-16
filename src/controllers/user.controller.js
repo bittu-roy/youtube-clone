@@ -4,6 +4,7 @@ import {User} from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 
 //a function to generate access and refresh tokens.
@@ -187,8 +188,8 @@ const logoutUser= asyncHandler(async(req, res)=>{
         //deleting/updating refresh token
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1
             }
         },
         {
@@ -247,7 +248,7 @@ const refreshAccessToken= asyncHandler(async(req, res)=>{
 
     return res
     .status(200)
-    .cookies("accessToken", accessToken, options)
+    .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", newRefreshToken, options)
     .json(
         new ApiResponse(
